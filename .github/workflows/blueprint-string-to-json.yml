@@ -14,7 +14,7 @@ on:
       reason:
         description: 'The reason for running the workflow'
         required: true
-        default: 'Manual run'
+        default: 'Manual Run'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -25,6 +25,7 @@ jobs:
     
     permissions:
       contents: write
+      #pull-requests: write
       
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -46,18 +47,18 @@ jobs:
             echo 'Reason: ${{ github.event.inputs.reason }}'
 
       - name: Blueprint String to JSON
-        id: dotnet-code-metrics
-        uses: dotnet/samples/github-actions/DotNet.GitHubAction@main
+        id: blueprint-string-to-json
+        uses: TTV-VOXindie/factorio-blueprint-book/BlueprintStringToJson/DotNet.GitHubAction@main #dotnet/samples/github-actions/DotNet.GitHubAction@main
         env:
           GREETINGS: 'Hello, .NET developers!' # ${{ secrets.GITHUB_TOKEN }}
         with:
           #owner: ${{ github.repository_owner }}
           #name: ${{ github.repository }}
           #branch: ${{ github.ref }}
-          dir: ${{ './github-actions/DotNet.GitHubAction' }}
+          dir: ${{ './' }}
       
       - name: Commit Changes
-        if: ${{ steps.dotnet-code-metrics.outputs.was-blueprint-changed }} == 'true'
+        if: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }} == 'true'
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
@@ -66,8 +67,8 @@ jobs:
           git push
       
         #uses: peter-evans/create-pull-request@v4
-        #if: ${{ steps.dotnet-code-metrics.outputs.was-blueprint-changed }} == 'true'
+        #if: ${{ steps.blueprint-string-to-json.was-blueprint-changed }} == 'true'
         #with:
-          #title: '${{ steps.dotnet-code-metrics.outputs.summary-title }}'
-          #body: '${{ steps.dotnet-code-metrics.outputs.summary-details }}'
+          #title: '${{ steps.blueprint-string-to-json.outputs.summary-title }}'
+          #body: '${{ steps.blueprint-string-to-json.outputs.summary-details }}'
           #commit-message: 'Blueprint String To JSON: automated pull request.'
