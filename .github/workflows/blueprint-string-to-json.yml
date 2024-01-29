@@ -48,9 +48,8 @@ jobs:
 
       - name: Convert Blueprint String to JSON
         id: blueprint-string-to-json
-        uses: ./BlueprintStringToJson/BlueprintStringToJsonGitHubAction #local version?
-        #uses: TTV-VOXindie/factorio-blueprint-book/BlueprintStringToJson/BlueprintStringToJsonGitHubAction@main #points to the dockerfile 
-        #uses: dotnet/samples/github-actions/DotNet.GitHubAction@main
+        uses: ./BlueprintStringToJson/BlueprintStringToJsonGitHubAction #points to action.yml
+        #uses: TTV-VOXindie/factorio-blueprint-book/BlueprintStringToJson/BlueprintStringToJsonGitHubAction@main #I think @main refers to the branch
         env:
           GREETINGS: 'Hello, .NET developers!' # ${{ secrets.GITHUB_TOKEN }}
         with:
