@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: 'Blueprint String to JSON'
+name: 'Convert Blueprint String to JSON'
 
 # Controls when the workflow will run
 on:
@@ -46,9 +46,9 @@ jobs:
         run: |
             echo 'Reason: ${{ github.event.inputs.reason }}'
 
-      - name: Blueprint String to JSON
+      - name: Convert Blueprint String to JSON
         id: blueprint-string-to-json
-        uses: TTV-VOXindie/factorio-blueprint-book/BlueprintStringToJson/@main #points to the dockerfile #dotnet/samples/github-actions/DotNet.GitHubAction@main
+        uses: TTV-VOXindie/factorio-blueprint-book/BlueprintStringToJson/DotNet.GitHubAction@main@main #points to the dockerfile #dotnet/samples/github-actions/DotNet.GitHubAction@main
         env:
           GREETINGS: 'Hello, .NET developers!' # ${{ secrets.GITHUB_TOKEN }}
         with:
