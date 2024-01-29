@@ -47,6 +47,11 @@ namespace DotNet.GitHubAction
             return host.Services.GetRequiredService<TService>();
         }
 
+        /// <summary>
+        /// Blueprint string format information taken from here: https://wiki.factorio.com/Blueprint_string_format
+        /// </summary>
+        /// <param name="blueprintString"></param>
+        /// <returns></returns>
         private static async Task<string> _blueprintStringToJson(string blueprintString)
         {
             //skip the first byte and decode from base 64

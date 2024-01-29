@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 as build-env
 
 # Copy everything and publish the release (publish implicitly restores and builds)
-COPY . ./MADEUPPATH
+COPY . ./MADEUPPATH #MADEUPPATH is just something to get around a weird build error in linux...can change this to something more descriptive later
 RUN dotnet publish ./MADEUPPATH/DotNet.GitHubAction.csproj -c Release -o out --no-self-contained
 
 # Label the container
