@@ -62,8 +62,8 @@ jobs:
       # Write the blueprint-string-to-json outputs for logging purposes
       - name: 'Log Outputs'
         run: |
-            echo 'was-blueprint-changed: ${{ steps.blueprint-string-to-json.was-blueprint-changed }}'
-            echo 'full ${{ steps.blueprint-string-to-json}}'
+            echo 'was-blueprint-changed: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }}'
+            echo 'full ${{ steps.outputs.blueprint-string-to-json}}'
       
       - name: Commit Changes
         if: steps.blueprint-string-to-json.outputs.was-blueprint-changed == true
@@ -75,7 +75,7 @@ jobs:
           git push
       
         #uses: peter-evans/create-pull-request@v4
-        #if: ${{ steps.blueprint-string-to-json.was-blueprint-changed }} == 'true'
+        #if: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }} == 'true'
         #with:
           #title: '${{ steps.blueprint-string-to-json.outputs.summary-title }}'
           #body: '${{ steps.blueprint-string-to-json.outputs.summary-details }}'
