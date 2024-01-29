@@ -230,7 +230,7 @@ namespace BlueprintStringToJsonGitHubAction
             {
                 using (StreamWriter textWriter = new StreamWriter(githubOutputFile!, true, Encoding.UTF8))
                 {
-                    textWriter.WriteLine($"was-blueprint-changed={wasBlueprintChanged}");
+                    textWriter.WriteLine($"was-blueprint-changed={wasBlueprintChanged.ToString().ToLower()}"); //this is done so we don't get weird shit happening in the github action workflow
                     //textWriter.WriteLine("summary-details<<EOF");
                     //textWriter.WriteLine(summary);
                     //textWriter.WriteLine("EOF");
@@ -238,12 +238,11 @@ namespace BlueprintStringToJsonGitHubAction
             }
             else
             {
-                Console.WriteLine($"::set-output name=was-blueprint-changed::{wasBlueprintChanged}");
+                Console.WriteLine($"::set-output name=was-blueprint-changed::{wasBlueprintChanged.ToString().ToLower()}");
             }
 
             Environment.Exit(0);
         }
-
     }
 }
 
