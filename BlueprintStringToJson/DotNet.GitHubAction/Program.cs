@@ -1,11 +1,11 @@
 ﻿using CommandLine;
-using Microsoft.Extensions.Logging.Console;
-using Microsoft.VisualBasic;
-using System.Collections.Immutable;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.IO.Compression;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Xml;
 
 namespace DotNet.GitHubAction
 {
@@ -14,9 +14,7 @@ namespace DotNet.GitHubAction
         public static async Task Main(string[] args)
         {
             //build host
-            using IHost host = Host.CreateDefaultBuilder(args)
-                .ConfigureServices((_, services) => services.AddGitHubActionServices())
-                .Build();
+            using IHost host = Host.CreateDefaultBuilder(args).Build();
 
             //build command line parser
             ParserResult<ActionInputs> parser = Parser.Default.ParseArguments(
