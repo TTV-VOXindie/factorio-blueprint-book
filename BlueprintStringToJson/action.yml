@@ -1,0 +1,39 @@
+name: 'Convert Blueprint String To JSON'
+description: 'A Github action that converts the blueprint string to JSON.'
+branding:
+  icon: code
+  color: blue
+inputs:
+  #owner:
+    #description: 'The owner of the repo. Assign from github.repository_owner. Example, "dotnet".'
+    #required: true
+  #name:
+    #description: 'The repository name. Example, "samples".'
+    #required: true
+  #branch:
+    #description: 'The branch name. Assign from github.ref. Example, "refs/heads/main".'
+    #required: true
+  dir:
+    description: 'The root directory to work from. Example, "path/to/code".'
+    required: true
+  #workspace:
+    #description: 'The workspace directory.'
+    #required: false
+    #default: '/github/workspace'
+outputs:
+  was-blueprint-changed:
+    description: 'Whether or not the blueprint was changed.'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+  #- '-o'
+  #- ${{ inputs.owner }}
+  #- '-n'
+  #- ${{ inputs.name }}
+  #- '-b'
+  #- ${{ inputs.branch }}
+  - '-d'
+  - ${{ inputs.dir }}
+  #- '-w'
+  #- ${{ inputs.workspace }}
