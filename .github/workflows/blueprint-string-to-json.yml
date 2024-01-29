@@ -63,7 +63,7 @@ jobs:
       - name: 'Log Outputs'
         run: |
             echo 'was-blueprint-changed: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }}'
-            echo 'full ${{ steps.outputs.blueprint-string-to-json}}'
+            echo 'full: ${{ steps.blueprint-string-to-json.outputs}}'
       
       - name: Commit Changes
         if: steps.blueprint-string-to-json.outputs.was-blueprint-changed == true
