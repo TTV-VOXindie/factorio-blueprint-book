@@ -70,7 +70,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          git commit -m "Blueprint String To JSON: automated pull request."
+          git commit -m "Blueprint String To JSON: automated commit."
           git push
       
         #uses: peter-evans/create-pull-request@v4
