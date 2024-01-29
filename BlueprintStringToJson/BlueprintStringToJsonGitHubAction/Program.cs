@@ -13,6 +13,12 @@ namespace BlueprintStringToJsonGitHubAction
     {
         public static async Task Main(string[] args)
         {
+            string? greetings = Environment.GetEnvironmentVariable("GREETINGS");
+            if (greetings?.Length > 0)
+            {
+                Console.WriteLine(greetings);
+            }
+
             //build host
             using IHost host = Host.CreateDefaultBuilder(args).Build();
 
