@@ -41,9 +41,9 @@ jobs:
       
       # Print the reason for the manual run if it applys
       - name: 'Print Manual Run Reason'
-      if: ${{ github.event_name == 'workflow_dispatch' }}
-      run: |
-        echo 'Reason: ${{ github.event.inputs.reason }}'
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+            echo 'Reason: ${{ github.event.inputs.reason }}'
 
       - name: Blueprint String to JSON
         id: dotnet-code-metrics
