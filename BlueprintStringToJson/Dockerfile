@@ -6,15 +6,15 @@ COPY . ./
 RUN dotnet publish ./DotNet.GitHubAction/DotNet.GitHubAction.csproj -c Release -o out --no-self-contained
 
 # Label the container
-LABEL maintainer="David Pine <david.pine@microsoft.com>"
-LABEL repository="https://github.com/dotnet/samples"
-LABEL homepage="https://github.com/dotnet/samples"
+LABEL maintainer="TTV VOXindie <twitch.tv/VOXindie>"
+LABEL repository="https://github.com/TTV-VOXindie/factorio-blueprint-book"
+LABEL homepage="https://github.com/TTV-VOXindie/factorio-blueprint-book"
 
 # Label as GitHub action
-LABEL com.github.actions.name=".NET code metric analyzer"
-LABEL com.github.actions.description="A Github action that maintains a CODE_METRICS.md file, reporting cylcomatic complexity, maintainability index, etc."
-LABEL com.github.actions.icon="sliders"
-LABEL com.github.actions.color="purple"
+LABEL com.github.actions.name="Blueprint String to JSON"
+LABEL com.github.actions.description="A Github action that converts the blueprint string to JSON."
+LABEL com.github.actions.icon="code"
+LABEL com.github.actions.color="blue"
 
 # Relayer the .NET SDK, anew with the build output
 FROM mcr.microsoft.com/dotnet/sdk:6.0
