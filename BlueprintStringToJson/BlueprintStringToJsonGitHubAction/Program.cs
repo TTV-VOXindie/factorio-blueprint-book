@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -77,6 +78,83 @@ namespace BlueprintStringToJsonGitHubAction
             }
         }
 
+        private static async Task<string> _incrementBlueprintVersionNumber(ActionInputs inputs, IHost host, CancellationTokenSource tokenSource)
+        {
+            ILogger log = _get<ILoggerFactory>(host)
+                    .CreateLogger(nameof(_incrementBlueprintVersionNumber));
+
+            int newVersion = 0;
+
+            //get the file path for the version file
+            string versionFileName = "version.txt";
+            string versionFullPath = Path.Combine(inputs.Directory, versionFileName);
+
+            //if there's a version file
+            if(File.Exists(versionFullPath))
+            {
+                //read the version file
+                string previousVersionString = await File.ReadAllTextAsync(versionFullPath);
+
+                //parse version as int
+                int previousVersion = int.Parse(previousVersionString);
+
+                //increment the version
+                newVersion = previousVersion + 1;
+
+                log.LogInformation($"Version file found with version {previousVersion}");
+            }
+
+            log.LogInformation($"Updating version to {newVersion}.");
+
+            string newVersionString = newVersion.ToString();
+
+            //save version
+            await File.WriteAllTextAsync(
+                path: versionFullPath,
+                contents: newVersionString,
+                cancellationToken: tokenSource.Token
+                );
+
+            return newVersionString;
+        }
+
+        private static string _readResource(string name)
+        {
+            //get assembly
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            //format: "{Namespace}.{Folder}.{filename}.{Extension}"
+            string resourcePath = assembly.GetManifestResourceNames()
+                    .Single(str => str.EndsWith(name));
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourcePath)!)
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        private static async Task _updateBlueprintReadme(string version, ActionInputs inputs, CancellationTokenSource tokenSource)
+        {
+            //get the template for the README
+            string readmeTemplate = _readResource("Blueprint Files README Template.md");
+
+            //replace the tokens in the template
+            string readmeContents = readmeTemplate
+                .Replace("{{version}}", version.ToString());
+
+            //get the file path for the readme
+            string fileName = "README.md";
+            string fullPath = Path.Combine(inputs.Directory, fileName);
+
+            //write the readme
+            await File.WriteAllTextAsync(
+                path: fullPath,
+                contents: readmeContents,
+                cancellationToken: tokenSource.Token
+                );
+        }        
+
         private static async Task _run(ActionInputs inputs, IHost host)
         {
             using CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -97,29 +175,48 @@ namespace BlueprintStringToJsonGitHubAction
             //read the blueprint string from the file
             string blueprintString = await File.ReadAllTextAsync(fullPath, tokenSource.Token);
 
+            //convert blueprint string to JSON
             string blueprintJson = await _blueprintStringToJson(blueprintString);
 
+            //get the file path for the blueprint json file
             string outputFileName = "BlueprintBook.json"; //TODO: make this part of the input
             string outputFullPath = Path.Combine(inputs.Directory, outputFileName);
-            bool outputFileExists = File.Exists(outputFullPath);
+            bool doesPreviousBlueprintFileExist = File.Exists(outputFullPath);
 
-            string? blueprintJsonPrevious = null;
-            if (outputFileExists)
+            bool wasBlueprintChanged;
+
+            //if a blueprint json file already exists
+            if (doesPreviousBlueprintFileExist)
             {
-                blueprintJsonPrevious = await File.ReadAllTextAsync(outputFullPath, tokenSource.Token);
+                //read the previous blueprint json
+                string blueprintJsonPrevious = await File.ReadAllTextAsync(outputFullPath, tokenSource.Token);
+
+                //blueprint was changed if it differs from the previous version
+                wasBlueprintChanged = blueprintJson != blueprintJsonPrevious;
+            }
+            else //the blueprint was changed if we don't have a previous version
+            {
+                wasBlueprintChanged = true;
             }
 
-            bool wasBlueprintChanged = !outputFileExists || blueprintJson != blueprintJsonPrevious;
-
+            //if the blueprint was changed
             if (wasBlueprintChanged)
             {
-               log.LogInformation($"{(outputFileExists ? "Updating" : "Creating")} {outputFileName} with latest data.");
+                //log what we're doing with the file
+               log.LogInformation($"{(doesPreviousBlueprintFileExist ? "Updating" : "Creating")} {outputFileName} with latest data.");
 
+                //write to the file
                 await File.WriteAllTextAsync(
                         path: outputFullPath,
                         contents: blueprintJson,
                         cancellationToken: tokenSource.Token
                         );
+
+                //increment the version number
+                string version = await _incrementBlueprintVersionNumber(inputs, host, tokenSource);
+
+                //update the readme
+                await _updateBlueprintReadme(version, inputs, tokenSource);
             }
             else
             {
