@@ -80,6 +80,7 @@ namespace BlueprintStringToJsonGitHubAction
         private static async Task _run(ActionInputs inputs, IHost host)
         {
             using CancellationTokenSource tokenSource = new CancellationTokenSource();
+            ILogger log = _get<ILoggerFactory>(host).CreateLogger(nameof(_run));
 
             string fileName = "BlueprintBook.txt"; //TODO: make this part of the input
             string fullPath = Path.Combine(inputs.Directory, fileName);
@@ -98,13 +99,9 @@ namespace BlueprintStringToJsonGitHubAction
 
             string blueprintJson = await _blueprintStringToJson(blueprintString);
 
-            string outputFileName = "BlueprintBook.json";
+            string outputFileName = "BlueprintBook.json"; //TODO: make this part of the input
             string outputFullPath = Path.Combine(inputs.Directory, outputFileName);
             bool outputFileExists = File.Exists(outputFullPath);
-
-            _get<ILoggerFactory>(host)
-                    .CreateLogger(nameof(_run))
-                    .LogInformation($"{(outputFileExists ? "Updating" : "Creating")} {outputFileName} with latest data.");
 
             string? blueprintJsonPrevious = null;
             if (outputFileExists)
@@ -114,11 +111,20 @@ namespace BlueprintStringToJsonGitHubAction
 
             bool wasBlueprintChanged = !outputFileExists || blueprintJson != blueprintJsonPrevious;
 
-            await File.WriteAllTextAsync(
-                    path: outputFullPath,
-                    contents: blueprintJson,
-                    cancellationToken: tokenSource.Token
-                    );
+            if (wasBlueprintChanged)
+            {
+               log.LogInformation($"{(outputFileExists ? "Updating" : "Creating")} {outputFileName} with latest data.");
+
+                await File.WriteAllTextAsync(
+                        path: outputFullPath,
+                        contents: blueprintJson,
+                        cancellationToken: tokenSource.Token
+                        );
+            }
+            else
+            {
+                log.LogInformation($"{outputFileName} was not changed.");
+            }
 
 
             // https://docs.github.com/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
