@@ -1,19 +1,6 @@
----
-languages:
-- csharp
-- dockerfile
-products:
-- dotnet
-- github
-page_type: sample
-name: "GitHub Actions with .NET"
-urlFragment: "create-dotnet-github-action"
-description: "A .NET 6 console application that contains the example from Create a GitHub Action with .NET tutorial."
----
-
 # Blueprint String to JSON
-A .NET 7 console application that contains a GitHub Action that converts the [blueprint string](/Blueprint%20Files/BlueprintBook.txt) to [json](Blueprint%20Files/BlueprintBook.json).
-It then updates the version number in the [version file](Blueprint%20Files/version.txt) and updates the [README](Blueprint%20Files/README.md) with the appropriate information.
+A .NET 7 console application that contains a GitHub Action that converts the [blueprint string](/Blueprint%20Files/BlueprintBook.txt) to [json](/Blueprint%20Files/BlueprintBook.json).
+It then updates the version number in the [version file](/Blueprint%20Files/version.txt) and updates the [README](/Blueprint%20Files/README.md) with the appropriate information.
 
 # .NET GitHub Action
 
