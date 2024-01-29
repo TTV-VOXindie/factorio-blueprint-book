@@ -65,7 +65,7 @@ jobs:
             echo 'was-blueprint-changed: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }}' #could do this in the program itself
       
       - name: Commit Changes
-        if: steps.blueprint-string-to-json.outputs.was-blueprint-changed == true
+        if: steps.blueprint-string-to-json.outputs.was-blueprint-changed == True
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
