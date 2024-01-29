@@ -8,11 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MarkdownBuilder" Version="0.2.0" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Metrics" Version="3.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
   </ItemGroup>
 
