@@ -45,6 +45,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
             echo 'Reason: ${{ github.event.inputs.reason }}'
+            echo 'WORK?: ${{ fromJSON(steps.blueprint-string-to-json.outputs.was-blueprint-changed) }}'
 
       - name: Convert Blueprint String to JSON
         id: blueprint-string-to-json
@@ -65,7 +66,7 @@ jobs:
             echo 'was-blueprint-changed: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }}' #could do this in the program itself
       
       - name: Commit Changes
-        if: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }} == 'true'
+        if: fromJSON(steps.blueprint-string-to-json.outputs.was-blueprint-changed)
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
