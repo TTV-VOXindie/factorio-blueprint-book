@@ -57,7 +57,7 @@ jobs:
           #owner: ${{ github.repository_owner }}
           #name: ${{ github.repository }}
           #branch: ${{ github.ref }}
-          dir: ${{ './' }}
+          dir: ${{ './Blueprint Files' }}
         
       # Write the blueprint-string-to-json outputs for logging purposes
       - name: 'Log Outputs'
