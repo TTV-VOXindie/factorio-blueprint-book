@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace DotNet.GitHubAction
+namespace BlueprintStringToJsonGitHubAction
 {
     public class Program
     {
@@ -27,7 +27,7 @@ namespace DotNet.GitHubAction
                 errors =>
                 {
                     _get<ILoggerFactory>(host)
-                        .CreateLogger("DotNet.GitHubAction.Program")
+                        .CreateLogger("BlueprintStringToJsonGitHubAction.Program")
                         .LogError(
                             string.Join(
                                 separator: Environment.NewLine,

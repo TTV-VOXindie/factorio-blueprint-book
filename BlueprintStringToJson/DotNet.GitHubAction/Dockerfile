@@ -2,9 +2,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 as build-env
 
 # Copy everything and publish the release (publish implicitly restores and builds)
-#MADEUPPATH is just something to get around a weird build error in linux...can change this to something more descriptive later
+# MADEUPPATH is just something to get around a weird build error in linux...can change this to something more descriptive later
 COPY . ./MADEUPPATH
-RUN dotnet publish ./MADEUPPATH/DotNet.GitHubAction.csproj -c Release -o out --no-self-contained
+RUN dotnet publish ./MADEUPPATH/BlueprintStringToJsonGitHubAction.csproj -c Release -o out --no-self-contained
 
 # Label the container
 LABEL maintainer="TTV VOXindie <twitch.tv/VOXindie>"
@@ -20,4 +20,4 @@ LABEL com.github.actions.color="blue"
 # Relayer the .NET SDK, anew with the build output
 FROM mcr.microsoft.com/dotnet/sdk:7.0
 COPY --from=build-env /out .
-ENTRYPOINT [ "dotnet", "/DotNet.GitHubAction.dll" ]
+ENTRYPOINT [ "dotnet", "/BlueprintStringToJsonGitHubAction.dll" ]
