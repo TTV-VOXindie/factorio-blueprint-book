@@ -8713,7 +8713,7 @@
                   }
                 ],
                 "item": "blueprint-book",
-                "label": "IO Opposite",
+                "label": "Opposite IO",
                 "icons": [
                   {
                     "signal": {
@@ -17603,7 +17603,7 @@
                   }
                 ],
                 "item": "blueprint-book",
-                "label": "IO Same",
+                "label": "Same IO",
                 "icons": [
                   {
                     "signal": {
