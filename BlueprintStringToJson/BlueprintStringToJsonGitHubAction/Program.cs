@@ -1,12 +1,17 @@
-﻿using CommandLine;
+﻿using BlueprintStringDataAccess;
+using BlueprintStringDataModels;
+using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.IO.Compression;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace BlueprintStringToJsonGitHubAction
 {
@@ -54,57 +59,40 @@ namespace BlueprintStringToJsonGitHubAction
             return host.Services.GetRequiredService<TService>();
         }
 
-        /// <summary>
-        /// Blueprint string format information taken from here: https://wiki.factorio.com/Blueprint_string_format
-        /// </summary>
-        /// <param name="blueprintString"></param>
-        /// <returns></returns>
-        private static async Task<string> _blueprintStringToJson(string blueprintString)
-        {
-            //skip the first byte and decode from base 64
-            byte[] decodedBlueprintString = Convert.FromBase64String(blueprintString.Substring(1));
-
-            using (MemoryStream inputStream = new MemoryStream(decodedBlueprintString))
-            using (ZLibStream zInputStream = new ZLibStream(inputStream, CompressionMode.Decompress))
-            using (MemoryStream outputStream = new MemoryStream())
-            {
-
-                await zInputStream.CopyToAsync(outputStream);
-                byte[] decompressed = outputStream.ToArray();
-
-                string blueprintJsonUnformatted = Encoding.Default.GetString(decompressed);
-
-                return JsonNode.Parse(blueprintJsonUnformatted)!.ToJsonString(new JsonSerializerOptions() { WriteIndented = true });
-            }
-        }
-
-        private static async Task<string> _incrementBlueprintVersionNumber(ActionInputs inputs, IHost host, CancellationTokenSource tokenSource)
+        private static async Task<int> _getBlueprintVersion(ActionInputs inputs, IHost host, CancellationTokenSource tokenSource)
         {
             ILogger log = _get<ILoggerFactory>(host)
-                    .CreateLogger(nameof(_incrementBlueprintVersionNumber));
-
-            int newVersion = 0;
+                    .CreateLogger(nameof(_getBlueprintVersion));
 
             //get the file path for the version file
             string versionFileName = "version.txt";
             string versionFullPath = Path.Combine(inputs.Directory, versionFileName);
 
             //if there's a version file
-            if(File.Exists(versionFullPath))
+            if (File.Exists(versionFullPath))
             {
                 //read the version file
-                string previousVersionString = await File.ReadAllTextAsync(versionFullPath);
+                string versionString = await File.ReadAllTextAsync(versionFullPath);
 
                 //parse version as int
-                int previousVersion = int.Parse(previousVersionString);
+                int version = int.Parse(versionString);
 
-                //increment the version
-                newVersion = previousVersion + 1;
-
-                log.LogInformation($"Version file found with version {previousVersion}");
+                return version;
             }
 
-            log.LogInformation($"Updating version to {newVersion}.");
+            return 0;
+        }
+
+        private static async Task<int> _incrementBlueprintVersionNumber(ActionInputs inputs, IHost host, int version, CancellationTokenSource tokenSource)
+        {
+            ILogger log = _get<ILoggerFactory>(host)
+                    .CreateLogger(nameof(_incrementBlueprintVersionNumber));
+
+            int newVersion = version + 1;
+
+            //get the file path for the version file
+            string versionFileName = "version.txt";
+            string versionFullPath = Path.Combine(inputs.Directory, versionFileName);
 
             string newVersionString = newVersion.ToString();
 
@@ -115,7 +103,7 @@ namespace BlueprintStringToJsonGitHubAction
                 cancellationToken: tokenSource.Token
                 );
 
-            return newVersionString;
+            return newVersion;
         }
 
         private static string _readResource(string name)
@@ -153,7 +141,158 @@ namespace BlueprintStringToJsonGitHubAction
                 contents: readmeContents,
                 cancellationToken: tokenSource.Token
                 );
-        }        
+        }
+        private static async Task _writeBlueprintStringJson(ILogger logger, ActionInputs inputs, string blueprintJson, CancellationToken cancellationToken)
+        {
+            BlueprintStringJsonModel? blueprintStringJson = JsonSerializer.Deserialize<BlueprintStringJsonModel>(blueprintJson);
+            
+            if (blueprintStringJson == null)
+            {
+                logger.LogWarning("Blueprint JSON is null.");
+                return;
+            }
+
+            BlueprintStringJsonModelValidator validator = new BlueprintStringJsonModelValidator();
+
+            if(!validator.IsValid(blueprintStringJson))
+            {
+                logger.LogError("Blueprint JSON is not valid.");
+                return;
+            }
+
+
+            if (blueprintStringJson.BlueprintBook == null)
+            {
+                logger.LogError("Root blueprint JSON is not a blueprint book.");
+                return;
+            }
+
+            string baseJsonDirectory = Path.Combine(inputs.Directory, "JSON");
+            
+            if (Directory.Exists(baseJsonDirectory))
+            {
+                //delete the JSON folder
+                Directory.Delete(baseJsonDirectory, true);
+            }
+
+            Directory.CreateDirectory(baseJsonDirectory);
+
+            await _handleBlueprintBookJson(logger, baseJsonDirectory, null, blueprintStringJson.BlueprintBook!, cancellationToken);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="index">The index of the blueprint book (if it is a child).</param>
+        /// <param name="blueprintBook"></param>
+        /// <returns></returns>
+        private static async Task _handleBlueprintBookJson(ILogger logger, string parent, int? index, BlueprintBook blueprintBook, CancellationToken cancellationToken)
+        {
+            //strip out invalid path name chars
+            string sanitizedLabel = _sanitizeLabel(blueprintBook.Label);
+
+            if(index != null)
+            {
+                sanitizedLabel = $"[{index}] {sanitizedLabel}";
+            }
+
+            string filePath = Path.Combine(parent, $"{sanitizedLabel}.json");
+            string blueprintBookJson = JsonSerializer.Serialize(blueprintBook, new JsonSerializerOptions() { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
+
+            //write the json
+            await File.WriteAllTextAsync(
+              path: filePath,
+              contents: blueprintBookJson,
+              cancellationToken: cancellationToken
+              );
+
+            string childrenFolderPath = Path.Combine(parent, sanitizedLabel);
+            Directory.CreateDirectory(childrenFolderPath);
+
+            for (int i = 0; i < blueprintBook.Blueprints.Count; i++)
+            {
+                BlueprintBookChild child = blueprintBook.Blueprints[i];
+
+                if (child.Blueprint != null)
+                {
+                    await _handleBlueprintJson(logger, childrenFolderPath, child.Index, child.Blueprint, cancellationToken);
+                }
+                else if(child.BlueprintBook != null)
+                {
+                    await _handleBlueprintBookJson(logger, childrenFolderPath, child.Index, child.BlueprintBook, cancellationToken);
+                }
+                else
+                {
+                    logger.LogWarning($"'{sanitizedLabel}' Child [{i}] did not have data.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="index">The index of the blueprint (if it is a child).</param>
+        /// <param name="blueprint"></param>
+        /// <returns></returns>
+        private static async Task _handleBlueprintJson(ILogger logger, string parent, int? index, Blueprint blueprint, CancellationToken cancellationToken)
+        {
+            //strip out invalid path name chars
+            string sanitizedLabel = _sanitizeLabel(blueprint.Label);
+
+            if (index != null)
+            {
+                sanitizedLabel = $"[{index}] {sanitizedLabel}";
+            }
+
+            string filePath = Path.Combine(parent, $"{sanitizedLabel}.json");
+            string blueprintJson = JsonSerializer.Serialize(blueprint, new JsonSerializerOptions() { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
+
+            //write the json
+            await File.WriteAllTextAsync(
+              path: filePath,
+              contents: blueprintJson,
+              cancellationToken: cancellationToken
+              );
+        }
+
+        private static string _sanitizeLabel(string label)
+        {
+            return _replaceInvalidPathNameChars(label.ToCharArray()).Trim();
+        }
+
+        private static HashSet<char> _invalidFileNameChars = new HashSet<char>()
+        {
+            '/',
+            '\\',
+            '?',
+            '%',
+            '*',
+            ':',
+            '|',
+            '"',
+            '<',
+            '>',
+            '.',
+            ',',
+            ';',
+            '='
+        };
+
+        private static string _replaceInvalidPathNameChars(char[] blueprintLabel)
+        {
+            for (int i = 0; i < blueprintLabel.Length; i++)
+            {
+                char c = blueprintLabel[i];
+                if (_invalidFileNameChars.Contains(c) || char.IsControl(c))
+                {
+                    blueprintLabel[i] = '_';
+                }
+            }
+
+            return new string(blueprintLabel);
+        }
 
         private static async Task _run(ActionInputs inputs, IHost host)
         {
@@ -175,8 +314,10 @@ namespace BlueprintStringToJsonGitHubAction
             //read the blueprint string from the file
             string blueprintString = await File.ReadAllTextAsync(fullPath, tokenSource.Token);
 
+            BlueprintStringDecoder blueprintDecoder = new BlueprintStringDecoder();
+
             //convert blueprint string to JSON
-            string blueprintJson = await _blueprintStringToJson(blueprintString);
+            string blueprintJson = await blueprintDecoder.DecodeToJsonAsync(blueprintString);          
 
             //get the file path for the blueprint json file
             string outputFileName = "BlueprintBook.json"; //TODO: make this part of the input
@@ -192,36 +333,45 @@ namespace BlueprintStringToJsonGitHubAction
                 string blueprintJsonPrevious = await File.ReadAllTextAsync(outputFullPath, tokenSource.Token);
 
                 //blueprint was changed if it differs from the previous version
-                wasBlueprintChanged = blueprintJson != blueprintJsonPrevious;
+                wasBlueprintChanged = blueprintJson.ReplaceLineEndings(Environment.NewLine) != blueprintJsonPrevious.ReplaceLineEndings(Environment.NewLine);
             }
             else //the blueprint was changed if we don't have a previous version
             {
                 wasBlueprintChanged = true;
             }
 
+            //log what we're doing with the file
+            log.LogInformation($"{(doesPreviousBlueprintFileExist ? "Updating" : "Creating")} {outputFileName} with latest data.");
+
+            await _writeBlueprintStringJson(
+                logger: _get<ILoggerFactory>(host).CreateLogger(nameof(_writeBlueprintStringJson)),
+                inputs: inputs,
+                blueprintJson: blueprintJson,
+                cancellationToken: tokenSource.Token
+                );
+
+            //write to the file
+            await File.WriteAllTextAsync(
+                    path: outputFullPath,
+                    contents: blueprintJson,
+                    cancellationToken: tokenSource.Token
+                    );
+
+            int version = await _getBlueprintVersion(inputs, host, tokenSource);
+
             //if the blueprint was changed
             if (wasBlueprintChanged)
             {
-                //log what we're doing with the file
-               log.LogInformation($"{(doesPreviousBlueprintFileExist ? "Updating" : "Creating")} {outputFileName} with latest data.");
-
-                //write to the file
-                await File.WriteAllTextAsync(
-                        path: outputFullPath,
-                        contents: blueprintJson,
-                        cancellationToken: tokenSource.Token
-                        );
-
                 //increment the version number
-                string version = await _incrementBlueprintVersionNumber(inputs, host, tokenSource);
-
-                //update the readme
-                await _updateBlueprintReadme(version, inputs, tokenSource);
+                version = await _incrementBlueprintVersionNumber(inputs, host, version, tokenSource);
             }
             else
             {
                 log.LogInformation($"{outputFileName} was not changed.");
             }
+
+            //update the readme
+            await _updateBlueprintReadme(version.ToString(), inputs, tokenSource);
 
 
             // https://docs.github.com/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter

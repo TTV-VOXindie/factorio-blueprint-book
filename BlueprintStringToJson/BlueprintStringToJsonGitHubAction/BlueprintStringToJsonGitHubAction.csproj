@@ -21,4 +21,9 @@
     <EmbeddedResource Include="Blueprint Files README Template.md" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BlueprintStringDataAccess\BlueprintStringDataValidators.csproj" />
+    <ProjectReference Include="..\FactorioDataModels\BlueprintStringDataModels.csproj" />
+  </ItemGroup>
+
 </Project>
