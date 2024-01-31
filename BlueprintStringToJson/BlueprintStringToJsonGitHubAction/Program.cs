@@ -96,6 +96,8 @@ namespace BlueprintStringToJsonGitHubAction
 
             string newVersionString = newVersion.ToString();
 
+
+            log.LogInformation($"Updating version to {newVersionString}");
             //save version
             await File.WriteAllTextAsync(
                 path: versionFullPath,
@@ -380,7 +382,7 @@ namespace BlueprintStringToJsonGitHubAction
             {
                 using (StreamWriter textWriter = new StreamWriter(githubOutputFile!, true, Encoding.UTF8))
                 {
-                    textWriter.WriteLine($"was-blueprint-changed={wasBlueprintChanged.ToString().ToLower()}"); //this is done so we don't get weird shit happening in the github action workflow
+                    textWriter.WriteLine($"was-blueprint-changed={wasBlueprintChanged.ToString().ToLower()}"); //the ToLower is done so we don't get weird shit happening in the github action workflow
                     //textWriter.WriteLine("summary-details<<EOF");
                     //textWriter.WriteLine(summary);
                     //textWriter.WriteLine("EOF");

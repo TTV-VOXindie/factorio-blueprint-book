@@ -63,13 +63,14 @@ jobs:
         run: |
             echo 'was-blueprint-changed: ${{ steps.blueprint-string-to-json.outputs.was-blueprint-changed }}' #could do this in the program itself
       
+      # Commits changes if a diff is found
       - name: Commit Changes
-        if: steps.blueprint-string-to-json.outputs.was-blueprint-changed == 'true'
+        #if: steps.blueprint-string-to-json.outputs.was-blueprint-changed == 'true'
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          git commit -m "Blueprint String To JSON: automated commit."
+          git diff --quiet || git commit -m "Blueprint String To JSON: automated commit."
           git push
       
         #uses: peter-evans/create-pull-request@v4
