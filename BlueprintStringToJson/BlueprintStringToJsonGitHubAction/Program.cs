@@ -192,19 +192,19 @@ namespace BlueprintStringToJsonGitHubAction
         private static async Task _handleBlueprintBookJson(ILogger logger, string parent, int? index, BlueprintBook blueprintBook, CancellationToken cancellationToken)
         {
             //strip out invalid path name chars
-            string sanitizedLabel = _sanitizeLabel(blueprintBook.Label);
+            string fileName = _sanitizeLabel(blueprintBook.Label);
 
-            string folderLabel = sanitizedLabel;
+            string folderName = fileName;
 
             if(index != null)
             {
-                folderLabel = $"[{index}] {sanitizedLabel}";
+                folderName = $"[{index}] {fileName}";
             }
 
-            string subFolderPath = Path.Combine(parent, folderLabel);
-            Directory.CreateDirectory(subFolderPath);
+            string folderPath = Path.Combine(parent, folderName);
+            Directory.CreateDirectory(folderPath);
 
-            string filePath = Path.Combine(subFolderPath, $"{sanitizedLabel}.json");
+            string filePath = Path.Combine(folderPath, $"{fileName}.json");
             string blueprintBookJson = JsonSerializer.Serialize(blueprintBook, new JsonSerializerOptions() { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
 
             //write the json
@@ -220,15 +220,15 @@ namespace BlueprintStringToJsonGitHubAction
 
                 if (child.Blueprint != null)
                 {
-                    await _handleBlueprintJson(logger, subFolderPath, child.Index, child.Blueprint, cancellationToken);
+                    await _handleBlueprintJson(logger, folderPath, child.Index, child.Blueprint, cancellationToken);
                 }
                 else if(child.BlueprintBook != null)
                 {
-                    await _handleBlueprintBookJson(logger, subFolderPath, child.Index, child.BlueprintBook, cancellationToken);
+                    await _handleBlueprintBookJson(logger, folderPath, child.Index, child.BlueprintBook, cancellationToken);
                 }
                 else
                 {
-                    logger.LogWarning($"'{folderLabel}' Child [{i}] did not have data.");
+                    logger.LogWarning($"'{folderName}' Child [{i}] did not have data.");
                 }
             }
         }
@@ -243,14 +243,19 @@ namespace BlueprintStringToJsonGitHubAction
         private static async Task _handleBlueprintJson(ILogger logger, string parent, int? index, Blueprint blueprint, CancellationToken cancellationToken)
         {
             //strip out invalid path name chars
-            string sanitizedLabel = _sanitizeLabel(blueprint.Label);
+            string fileName = _sanitizeLabel(blueprint.Label);
+
+            string folderName = fileName;
 
             if (index != null)
             {
-                sanitizedLabel = $"[{index}] {sanitizedLabel}";
+                folderName = $"[{index}] {fileName}";
             }
 
-            string filePath = Path.Combine(parent, $"{sanitizedLabel}.json");
+            string folderPath = Path.Combine(parent, folderName);
+            Directory.CreateDirectory(folderPath);
+
+            string filePath = Path.Combine(folderPath, $"{fileName}.json");
             string blueprintJson = JsonSerializer.Serialize(blueprint, new JsonSerializerOptions() { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
 
             //write the json
