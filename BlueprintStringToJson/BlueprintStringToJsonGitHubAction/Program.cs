@@ -194,12 +194,17 @@ namespace BlueprintStringToJsonGitHubAction
             //strip out invalid path name chars
             string sanitizedLabel = _sanitizeLabel(blueprintBook.Label);
 
+            string folderLabel = sanitizedLabel;
+
             if(index != null)
             {
-                sanitizedLabel = $"[{index}] {sanitizedLabel}";
+                folderLabel = $"[{index}] {sanitizedLabel}";
             }
 
-            string filePath = Path.Combine(parent, $"{sanitizedLabel}.json");
+            string subFolderPath = Path.Combine(parent, folderLabel);
+            Directory.CreateDirectory(subFolderPath);
+
+            string filePath = Path.Combine(subFolderPath, $"{sanitizedLabel}.json");
             string blueprintBookJson = JsonSerializer.Serialize(blueprintBook, new JsonSerializerOptions() { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
 
             //write the json
@@ -209,24 +214,21 @@ namespace BlueprintStringToJsonGitHubAction
               cancellationToken: cancellationToken
               );
 
-            string childrenFolderPath = Path.Combine(parent, sanitizedLabel);
-            Directory.CreateDirectory(childrenFolderPath);
-
             for (int i = 0; i < blueprintBook.Blueprints.Count; i++)
             {
                 BlueprintBookChild child = blueprintBook.Blueprints[i];
 
                 if (child.Blueprint != null)
                 {
-                    await _handleBlueprintJson(logger, childrenFolderPath, child.Index, child.Blueprint, cancellationToken);
+                    await _handleBlueprintJson(logger, subFolderPath, child.Index, child.Blueprint, cancellationToken);
                 }
                 else if(child.BlueprintBook != null)
                 {
-                    await _handleBlueprintBookJson(logger, childrenFolderPath, child.Index, child.BlueprintBook, cancellationToken);
+                    await _handleBlueprintBookJson(logger, subFolderPath, child.Index, child.BlueprintBook, cancellationToken);
                 }
                 else
                 {
-                    logger.LogWarning($"'{sanitizedLabel}' Child [{i}] did not have data.");
+                    logger.LogWarning($"'{folderLabel}' Child [{i}] did not have data.");
                 }
             }
         }
