@@ -16,9 +16,9 @@ LABEL com.github.actions.description="A Github action that converts the blueprin
 LABEL com.github.actions.icon="code"
 LABEL com.github.actions.color="blue"
 
-RUN dir -s
+RUN ls
 
 # Relayer the .NET SDK, anew with the build output
 FROM mcr.microsoft.com/dotnet/sdk:7.0
 COPY --from=build-env /out .
-ENTRYPOINT [ "dotnet", "./SolutionItems/BlueprintStringToJsonGitHubAction.dll" ]
+ENTRYPOINT [ "dotnet", "/BlueprintStringToJsonGitHubAction.dll" ]
