@@ -16,6 +16,8 @@ LABEL com.github.actions.description="A Github action that converts the blueprin
 LABEL com.github.actions.icon="code"
 LABEL com.github.actions.color="blue"
 
+RUN dir -s
+
 # Relayer the .NET SDK, anew with the build output
 FROM mcr.microsoft.com/dotnet/sdk:7.0
 COPY --from=build-env /out .
