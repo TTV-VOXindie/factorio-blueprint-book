@@ -1,4 +1,4 @@
-﻿# VOX's Blueprints
+﻿# VOX's Blueprints (V{{version}})
 [![Convert Blueprint String to JSON](https://github.com/TTV-VOXindie/factorio-blueprint-book/actions/workflows/blueprint-string-to-json.yml/badge.svg?branch=main)](https://github.com/TTV-VOXindie/factorio-blueprint-book/actions/workflows/blueprint-string-to-json.yml)
 
 > [!NOTE]  

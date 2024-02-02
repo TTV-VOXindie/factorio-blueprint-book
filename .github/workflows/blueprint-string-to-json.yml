@@ -71,8 +71,11 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
+          echo "Files changed:"
           git diff --name-only --staged
+          echo "Committing Changes:"
           git commit -m "Automated Commit.  Blueprint Version ${{ toJSON(steps.blueprint-string-to-json.outputs.blueprint-version) }}." || exit 0
+          echo "Pushing changes:"
           git push
       
         #uses: peter-evans/create-pull-request@v4
