@@ -146,13 +146,14 @@ namespace BlueprintStringToJsonGitHubAction
                 );
         }
 
-        private static async Task _updateBlueprintReadme(string version, ActionInputs inputs, CancellationTokenSource tokenSource)
+        private static async Task _updateBlueprintReadme(string blueprintString, string version, ActionInputs inputs, CancellationTokenSource tokenSource)
         {
             //get the template for the README
             string readmeTemplate = _readResource("Blueprint Files README Template.md");
 
             //replace the tokens in the template
             string readmeContents = readmeTemplate
+                .Replace("{{blueprint-string}}", blueprintString)
                 .Replace("{{version}}", version);
 
             //get the file path for the readme
@@ -407,7 +408,7 @@ namespace BlueprintStringToJsonGitHubAction
             await _updateMainReadme(blueprintString, version.ToString(), tokenSource);
 
             //update the readme
-            await _updateBlueprintReadme(version.ToString(), inputs, tokenSource);
+            await _updateBlueprintReadme(blueprintString, version.ToString(), inputs, tokenSource);
 
             // https://docs.github.com/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
             string? githubOutputFile = Environment.GetEnvironmentVariable("GITHUB_OUTPUT", EnvironmentVariableTarget.Process);
