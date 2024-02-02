@@ -23,6 +23,8 @@ inputs:
 outputs:
   was-blueprint-changed:
     description: 'Whether or not the blueprint was changed.'
+  blueprint-version:
+    description: 'The current version of the blueprint.'
 runs:
   using: 'docker'
   image: '../Dockerfile'

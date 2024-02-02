@@ -382,7 +382,6 @@ namespace BlueprintStringToJsonGitHubAction
             //update the readme
             await _updateBlueprintReadme(version.ToString(), inputs, tokenSource);
 
-
             // https://docs.github.com/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
             string? githubOutputFile = Environment.GetEnvironmentVariable("GITHUB_OUTPUT", EnvironmentVariableTarget.Process);
             if (!string.IsNullOrWhiteSpace(githubOutputFile))
@@ -390,6 +389,7 @@ namespace BlueprintStringToJsonGitHubAction
                 using (StreamWriter textWriter = new StreamWriter(githubOutputFile!, true, Encoding.UTF8))
                 {
                     textWriter.WriteLine($"was-blueprint-changed={wasBlueprintChanged.ToString().ToLower()}"); //the ToLower is done so we don't get weird shit happening in the github action workflow
+                    textWriter.WriteLine($"blueprint-version={version}");
                     //textWriter.WriteLine("summary-details<<EOF");
                     //textWriter.WriteLine(summary);
                     //textWriter.WriteLine("EOF");
@@ -398,6 +398,7 @@ namespace BlueprintStringToJsonGitHubAction
             else
             {
                 Console.WriteLine($"::set-output name=was-blueprint-changed::{wasBlueprintChanged.ToString().ToLower()}");
+                Console.WriteLine($"::set-output name=blueprint-version::{version}");
             }
 
             Environment.Exit(0);
