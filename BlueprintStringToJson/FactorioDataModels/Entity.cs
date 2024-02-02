@@ -26,7 +26,7 @@ namespace BlueprintStringDataModels
         /// Direction of the entity.
         /// </summary>
         [JsonPropertyName("direction")]
-        public uint? Direction { get; set; }
+        public Direction? Direction { get; set; } //TODO: this should only write when it's >= 0
 
         /// <summary>
         /// Orientation of cargo wagon or locomotive.
