@@ -8,7 +8,7 @@
 
 This is a repository meant for storing blueprints made by [VOXindie](https://www.twitch.tv/voxindie).
 
-When the [blueprint string](Blueprint%20Files/BlueprintBook.txt) is updated, a [github action](/.github/workflows/blueprint-string-to-json.yml) is run to automatically update files in the [Blueprint Files](Blueprint%20Files) folder.
+When the [blueprint string](Blueprint%20Files/BlueprintBook.txt) is updated, a [github action](.github/workflows/blueprint-string-to-json.yml) is run to automatically update files in the [Blueprint Files](Blueprint%20Files) folder.
 
 The [github action](/.github/workflows/blueprint-string-to-json.yml) automatically decodes the [blueprint string](Blueprint%20Files/BlueprintBook.txt) into [JSON](Blueprint%20Files/BlueprintBook.json) and then breaks the [JSON](Blueprint%20Files/BlueprintBook.json) up into [separate files](Blueprint%20Files/JSON) for each nested blueprint book and blueprint found within.
 
@@ -17,3 +17,7 @@ The [github action](/.github/workflows/blueprint-string-to-json.yml) automatical
 ````
 {{blueprint-string}}
 ````
+
+# Factorio Image Assets
+
+All [Factorio image assets](Factorio Image Assets) are subject to the terms of service found here: https://factorio.com/terms-of-service
