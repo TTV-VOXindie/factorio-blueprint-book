@@ -71,6 +71,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
+          git diff --name-only --staged
           git commit -m "Automated Commit.  Blueprint Version ${{ toJSON(steps.blueprint-string-to-json.outputs.blueprint-version) }}." || exit 0
           git push
       
