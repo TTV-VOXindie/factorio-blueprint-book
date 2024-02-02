@@ -124,6 +124,27 @@ namespace BlueprintStringToJsonGitHubAction
             }
         }
 
+        private static async Task _updateMainReadme(string blueprintString, CancellationTokenSource tokenSource)
+        {
+            //get the template for the README
+            string readmeTemplate = _readResource("Main README Template.md");
+
+            //replace the tokens in the template
+            string readmeContents = readmeTemplate
+                .Replace("{{blueprint-string}}", blueprintString);
+
+            //get the file path for the readme
+            string fileName = "README.md";
+            string fullPath = fileName;
+
+            //write the readme
+            await File.WriteAllTextAsync(
+                path: fullPath,
+                contents: readmeContents,
+                cancellationToken: tokenSource.Token
+                );
+        }
+
         private static async Task _updateBlueprintReadme(string version, ActionInputs inputs, CancellationTokenSource tokenSource)
         {
             //get the template for the README
@@ -144,6 +165,7 @@ namespace BlueprintStringToJsonGitHubAction
                 cancellationToken: tokenSource.Token
                 );
         }
+
         private static async Task _writeBlueprintStringJson(ILogger logger, ActionInputs inputs, string blueprintJson, CancellationToken cancellationToken)
         {
             BlueprintStringJsonModel? blueprintStringJson = JsonSerializer.Deserialize<BlueprintStringJsonModel>(blueprintJson);
@@ -320,8 +342,12 @@ namespace BlueprintStringToJsonGitHubAction
 
                 return;
             }
+
             //read the blueprint string from the file
             string blueprintString = await File.ReadAllTextAsync(fullPath, tokenSource.Token);
+
+            //update the main readme
+            await _updateMainReadme(blueprintString, tokenSource);
 
             BlueprintStringDecoder blueprintDecoder = new BlueprintStringDecoder();
 
