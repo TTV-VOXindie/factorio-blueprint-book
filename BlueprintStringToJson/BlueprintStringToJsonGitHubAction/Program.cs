@@ -124,14 +124,15 @@ namespace BlueprintStringToJsonGitHubAction
             }
         }
 
-        private static async Task _updateMainReadme(string blueprintString, CancellationTokenSource tokenSource)
+        private static async Task _updateMainReadme(string blueprintString, string version, CancellationTokenSource tokenSource)
         {
             //get the template for the README
             string readmeTemplate = _readResource("Main README Template.md");
 
             //replace the tokens in the template
             string readmeContents = readmeTemplate
-                .Replace("{{blueprint-string}}", blueprintString);
+                .Replace("{{blueprint-string}}", blueprintString)
+                .Replace("{{version}}", version.ToString());
 
             //get the file path for the readme
             string fileName = "README.md";
@@ -152,7 +153,7 @@ namespace BlueprintStringToJsonGitHubAction
 
             //replace the tokens in the template
             string readmeContents = readmeTemplate
-                .Replace("{{version}}", version.ToString());
+                .Replace("{{version}}", version);
 
             //get the file path for the readme
             string fileName = "README.md";
@@ -346,9 +347,6 @@ namespace BlueprintStringToJsonGitHubAction
             //read the blueprint string from the file
             string blueprintString = await File.ReadAllTextAsync(fullPath, tokenSource.Token);
 
-            //update the main readme
-            await _updateMainReadme(blueprintString, tokenSource);
-
             BlueprintStringDecoder blueprintDecoder = new BlueprintStringDecoder();
 
             //convert blueprint string to JSON
@@ -404,6 +402,9 @@ namespace BlueprintStringToJsonGitHubAction
             {
                 log.LogInformation($"{outputFileName} was not changed.");
             }
+
+            //update the main readme
+            await _updateMainReadme(blueprintString, version.ToString(), tokenSource);
 
             //update the readme
             await _updateBlueprintReadme(version.ToString(), inputs, tokenSource);
