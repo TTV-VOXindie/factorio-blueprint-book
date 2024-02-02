@@ -1,4 +1,4 @@
-# Vox's Blueprints
+# VOX's Blueprints
 [![Convert Blueprint String to JSON](https://github.com/TTV-VOXindie/factorio-blueprint-book/actions/workflows/blueprint-string-to-json.yml/badge.svg?branch=main)](https://github.com/TTV-VOXindie/factorio-blueprint-book/actions/workflows/blueprint-string-to-json.yml)
 
 This is a repository meant for storing blueprints made by [VOXindie](https://www.twitch.tv/voxindie).
