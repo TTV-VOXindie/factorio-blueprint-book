@@ -27,7 +27,7 @@ outputs:
     description: 'The current version of the blueprint.'
 runs:
   using: 'docker'
-  image: '../../Dockerfile'
+  image: '../Dockerfile'
   args:
   #- '-o'
   #- ${{ inputs.owner }}
