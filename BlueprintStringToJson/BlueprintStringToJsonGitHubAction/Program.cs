@@ -4,13 +4,9 @@ using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO.Compression;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace BlueprintStringToJsonGitHubAction
@@ -50,7 +46,7 @@ namespace BlueprintStringToJsonGitHubAction
                     Environment.Exit(2);
                 });
 
-            await parser.WithParsedAsync(options => _run(options, host));
+            await parser.WithParsedAsync(inputs => _run(inputs, host));
             await host.RunAsync();
         }
 

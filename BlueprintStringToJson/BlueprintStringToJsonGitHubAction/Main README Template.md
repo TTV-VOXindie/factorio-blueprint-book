@@ -20,4 +20,4 @@ The [github action](/.github/workflows/blueprint-string-to-json.yml) automatical
 
 # Factorio Image Assets
 
-All [Factorio image assets](Factorio Image Assets) are subject to the terms of service found here: https://factorio.com/terms-of-service
+All [Factorio image assets](Factorio%20Image%20Assets) are subject to the terms of service found [here](https://factorio.com/terms-of-service).
