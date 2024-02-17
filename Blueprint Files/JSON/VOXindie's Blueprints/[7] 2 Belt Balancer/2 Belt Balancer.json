@@ -1,0 +1,138 @@
+{
+  "entities": [
+    {
+      "entity_number": 1,
+      "name": "splitter",
+      "position": {
+        "x": -18.5,
+        "y": -179
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 2,
+      "name": "splitter",
+      "position": {
+        "x": -19.5,
+        "y": -178
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 3,
+      "name": "splitter",
+      "position": {
+        "x": -16.5,
+        "y": -179
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 4,
+      "name": "transport-belt",
+      "position": {
+        "x": -17.5,
+        "y": -179.5
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 5,
+      "name": "transport-belt",
+      "position": {
+        "x": -17.5,
+        "y": -178.5
+      }
+    },
+    {
+      "entity_number": 6,
+      "name": "transport-belt",
+      "position": {
+        "x": -15.5,
+        "y": -179.5
+      },
+      "direction": 4
+    },
+    {
+      "entity_number": 7,
+      "name": "transport-belt",
+      "position": {
+        "x": -15.5,
+        "y": -178.5
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 8,
+      "name": "splitter",
+      "position": {
+        "x": -18.5,
+        "y": -177
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 9,
+      "name": "splitter",
+      "position": {
+        "x": -16.5,
+        "y": -177
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 10,
+      "name": "transport-belt",
+      "position": {
+        "x": -17.5,
+        "y": -176.5
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 11,
+      "name": "transport-belt",
+      "position": {
+        "x": -17.5,
+        "y": -177.5
+      },
+      "direction": 4
+    },
+    {
+      "entity_number": 12,
+      "name": "transport-belt",
+      "position": {
+        "x": -15.5,
+        "y": -177.5
+      },
+      "direction": 2
+    },
+    {
+      "entity_number": 13,
+      "name": "transport-belt",
+      "position": {
+        "x": -15.5,
+        "y": -176.5
+      }
+    }
+  ],
+  "item": "blueprint",
+  "label": "2 Belt Balancer",
+  "icons": [
+    {
+      "index": 1,
+      "signal": {
+        "type": "item",
+        "name": "splitter"
+      }
+    },
+    {
+      "index": 2,
+      "signal": {
+        "type": "item",
+        "name": "transport-belt"
+      }
+    }
+  ],
+  "version": 281479278493696
+}
